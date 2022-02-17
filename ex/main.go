@@ -7,9 +7,8 @@ import (
 	"sort"
 )
 
-// type Serve []map[string]string
 func printSlice(s []int) {
-	log.Printf("\nlen=%d\ncap=%d\n%v\n", len(s), cap(s), s)
+	log.Printf("ex6\nlen=%d\ncap=%d\n%v\n", len(s), cap(s), s)
 }
 
 type User struct {
@@ -19,11 +18,24 @@ type User struct {
 	address string
   }
 
-func (u*User) GetName() string
-func (u*User) GetAge() int
-func (u*User) GetGender() bool
-func (u*User) GetAddress() string
+   	func (u*User) GetName() string{
+		   return u.name
+	   }
+   	func (u*User) GetAge() int{
+		   return int(u.age)
+	   }
+   	func (u*User) GetGender() bool{
+		   return u.gender
+	   }
+  	func (u*User) GetAddress() string{
+		  return u.address
+	  }
 
+
+ var m =  map[string]User {
+	"person1": {"a", 15 , true, "ab"},
+	"person2": {"b",16 , false, "bc"},
+}
 
 func main() {
 
@@ -42,56 +54,52 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// log.Printf("Name:%s, Class:%s", sv.Name, sv.Class)
-	log.Println(sv)
+	log.Println("ex1\n",sv)
 
 
 
 
 
-	// ex3
-		needle := "admin"
-		idx := sort.Search(len(sv), func(i int) bool {
-			return string(sv[i].Name) >= needle
-		})
+	// ex3 loiiiii
+		values := "admin"
+		 idx := sort.Search(len(sv), func(i int) bool {
+		 	return string(sv[i].Name) >= values
+		 })
 
-		if sv[idx].Name == needle {
-			log.Println("Found:", idx, sv[idx])
-		} else {
-			log.Println("Found noting ")
-		}
-
-
+		 if sv[idx].Name == values {
+		 	log.Println("ex3\nFound:", idx, sv[idx])
+		 } else {
+		 	log.Println("ex3\nFound nothing ")
+		 }
+		
 	 
 
 	//  ex4
-	//  Name := "fileCustome"
-	//  Class := "org.cofax.cds.FileServlet.Custome"
-		input := []byte(`[{
-			"name": "fileCustome",
-			"class": "org.cofax.cds.FileServlet.Custome"
-		}]`)
-		var add []Serve
-		err = json.Unmarshal(input, &add)
-			if (err != nil) {
-				log.Fatal(err)
-			}
-			sv = append(sv, add...)  
-			for _, v := range sv {
-				log.Println(v)
-			}
-			log.Println()
-			result, err := json.Marshal(sv)
-			if err != nil {
-				log.Println(err)
-			}
-			log.Println(string(result))
+	input := []byte(`[{
+		"name": "fileCustome",
+		"class": "org.cofax.cds.FileServlet.Custome"
+	}]`)
+	var add []Serve
+	err = json.Unmarshal(input, &add)
+		if (err != nil) {
+			log.Fatal(err)
+		}
+		sv = append(sv, add...)  
+		for _, v := range sv {
+			log.Println(v)
+		}
+		log.Println()
+		result, err := json.Marshal(sv)
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println("ex4\n",string(result))
     	// log.Println("RECORDS:", sv)
 
 
 
 		// ex5
-		log.Printf("Address of elements:\n e[1] %p\n e[2] %p\n e[3] %p\n", &sv[0], &sv[1], &sv[2])
+		log.Printf("ex5\nAddress of elements:\n e[1] %p\n e[2] %p\n e[3] %p\n", &sv[0], &sv[1], &sv[2])
 
 
 
@@ -112,12 +120,7 @@ func main() {
 
 
 	// ex7
-    value := []string{"a", "b", "c", "d"}
-	log.Println(value)
-
-	valueMap := make(map[string]*User)
-	for i := 0; i < len(value); i++ {  
-		valueMap[i] = value[i]  
-	   }  
-	   log.Println(valueMap) 
+	
+	log.Println("ex7\n",m)
+	
 }

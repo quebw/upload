@@ -1,158 +1,238 @@
 package main
 
 import (
-	"context"
+	"bufio"
 	"log"
+	"os"
+	"runtime"
 	"strconv"
+	"sync"
 	"time"
 )
 
-func ex_1() {
-	for i := 1; i <= 3; i++ {
-		log.Println("time now: {milliseconds}")
-		time.Sleep(3 * time.Second)
-	}
-	log.Println("ket thuc")
+type Line struct {
+	so_dong_hien_tai int
+	gia_tri          string
 }
 
-func ex_2() {
-	timestamp := time.Now().Unix()
-	log.Println("Unix timestamp is:", timestamp)
-	now := time.Now()
-	log.Println("Current timestamp is:", now)
-}
+var wg sync.WaitGroup
+var m sync.Mutex
 
-func ex_3(ctx context.Context) error {
-	ctx, cancle := context.WithTimeout(ctx, 3*time.Second)
-	defer cancle()
-	for i := 0; i <= 3; i++ {
-		select {
-		case <-ctx.Done():
-			log.Println("Time out!")
-			return ctx.Err()
-		default:
-			time.Sleep(3 * time.Second)
-			log.Println("No :", i)
-		}
-	}
-	log.Println("All done")
-	return nil
-}
-
-func ex_4() {
-	unixTimestamp := "1592190294764144364"
-	unixIntValue, err := strconv.ParseInt(unixTimestamp, 10, 64)
-	if err != nil {
-		log.Println(err)
-	}
-	timeStamp := time.Unix(unixIntValue, 0)
-	// log.Println(timeStamp)
-	hr, min, sec := timeStamp.Clock()
-	log.Printf("Clock: [%d]hour : [%d]minutes : [%d]second", hr, min, sec)
-	log.Println("number_of_minutes of unixTimestamp :", hr*60+min+sec/60)
-
-}
-
-func ex_5() {
-	unixTimestamp := "1592190385"
-	unixIntValue, err := strconv.ParseInt(unixTimestamp, 10, 64)
-	if err != nil {
-		log.Println(err)
-	}
-	newTime := time.Unix(unixIntValue, 0)
-	strDate := newTime.Format(time.UnixDate)
-	log.Println("Number :", newTime.UTC())
-	log.Println("String :", strDate)
-}
-
-func x(ctx context.Context) {
-	time_now := time.Now().UnixNano()
-
-	select {
-	case <-time.After(3 * time.Second):
-		now := time.Now().UnixNano() - time_now
-		log.Println("Result:", now)
-	case <-ctx.Done():
-		log.Println(ctx.Err())
-	}
-}
-
-func ex_7() {
-	// time_now := time.Now().UnixNano()
-
-	// ctx, cancel := context.WithCancel(context.Background())
-	// select {
-	// case <-time.After(3 * time.Second):
-	// 	now := time.Now().UnixNano() - time_now
-	// 	log.Println("Result:", now)
-	// case <-ctx.Done():
-	// 	log.Println(ctx.Err())
-	// }
-	// cancel()
-
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	x(ctx)
-	cancel()
-}
-
-func ex_8() {
-	ticker := time.NewTicker(100 * time.Millisecond)
-	done := make(chan bool)
-
+func ex_1a() {
+	log.Print("hello 1")
 	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case t := <-ticker.C:
-				log.Println("${time.Now().Unix()} done", t)
-			}
-		}
+		time.Sleep(1 * time.Second)
+		log.Print("hello 3")
 	}()
+	log.Print("hello 2")
+	time.Sleep(3 * time.Second)
+}
 
-	time.Sleep(500 * time.Millisecond)
-	ticker.Stop()
-	done <- true
-	log.Println("Done!")
+func ex_1b() {
+	ch1 := make(chan string)
+	log.Print("hello 1")
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch1 <- "hello 3"
+	}()
+	a := <-ch1
+	log.Println(a)
+	log.Print("hello 2")
+}
+
+func ex_1c() {
+	log.Print("hello 1")
+	wg.Add(1)
+	go func() {
+		time.Sleep(1 * time.Second)
+		log.Print("hello 3")
+		wg.Done()
+	}()
+	wg.Wait()
+	log.Print("hello 2")
+}
+
+func ex_1d() {
+	log.Print("hello 1")
+	go func() {
+		m.Lock()
+		log.Print("hello 3")
+		m.Unlock()
+	}()
+	time.Sleep(1 * time.Second)
+
+	log.Print("hello 2")
+}
+
+// func ex_2() {
+// 	X := make(map[string]string)
+// 	for i := 0; i < 3; i++ {
+// 		wg.Add(3)
+// 		go func() {
+// 			for j := 0; j <= 1000; j++ {
+// 				m.Lock()
+
+// 				X["key"] = "value"
+
+// 				log.Println(j, X)
+// 				wg.Done()
+// 				m.Unlock()
+
+// 			}
+
+// 		}()
+// 	}
+// 	wg.Wait()
+
+// }
+
+func ex2_add1(X map[string]string) {
+	a := "value1_"
+	for i := 0; i < 1000; i++ {
+		m.Lock()
+		add := a + strconv.Itoa(i)
+		// int -> string
+		X[add] = strconv.Itoa(i)
+		m.Unlock()
+	}
+	wg.Done()
+}
+
+func ex2_add2(X map[string]string) {
+	a := "value2_"
+	for i := 0; i < 1000; i++ {
+		m.Lock()
+		add := a + strconv.Itoa(i)
+		X[add] = strconv.Itoa(i)
+		m.Unlock()
+	}
+	wg.Done()
+}
+
+func ex2_add3(X map[string]string) {
+	a := "value3_"
+	for i := 0; i < 1000; i++ {
+		m.Lock()
+		add := a + strconv.Itoa(i)
+		X[add] = strconv.Itoa(i)
+		m.Unlock()
+	}
+	wg.Done()
 
 }
 
-func ex_9() {
-	required_Time := time.Duration(100) * time.Millisecond
-	// log.Println(required_Time)
-	f := func() {
-		log.Println("im study")
+// ex3
+func errFunc() {
+	var mt sync.Mutex
+
+	m := make(map[int]int)
+	for i := 0; i < 1000; i++ {
+		go func() {
+			for j := 1; j < 10000; j++ {
+				mt.Lock()
+				if _, ok := m[j]; ok {
+					delete(m, j)
+					continue
+				}
+				m[j] = j * 10
+				mt.Unlock()
+			}
+		}()
 	}
-	Timer1 := time.AfterFunc(required_Time, f)
-	defer Timer1.Stop()
-	time.Sleep(2 * time.Second)
+
+	log.Print("done")
+}
+
+// func ex4() {
+
+// 	data, err := ioutil.ReadFile("file.txt")
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// 	file := string(data)
+// 	line := 0
+// 	temp := strings.Split(file, "\n")
+// 	for _, item := range temp {
+// 		log.Println("[", line, "] \t", item)
+// 		line++
+// 	}
+// 	log.Println("xong")
+// 	log.Println(runtime.NumGoroutine(), "Goroutines")
+
+// }
+
+func ex4() {
+	ch := make(chan string, 10)
+	finish := make(chan bool, 10)
+	file, err := os.Open("file.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	a := []*Line{}
+	line := 0
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		ch <- scanner.Text()
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go data(finish, ch, scanner)
+			wg.Done()
+		}
+		wg.Wait()
+		time.Sleep(100 * time.Millisecond)
+		output := Line{so_dong_hien_tai: line, gia_tri: scanner.Text()}
+		temp := append(a, &output)
+		line++
+		for i := range temp {
+			log.Println("No:", temp[i].so_dong_hien_tai, "Output:", temp[i].gia_tri)
+		}
+		wg.Wait()
+	}
+
+	log.Println("xong")
+	log.Println(runtime.NumGoroutine(), "Goroutines")
+
+}
+
+func data(finish chan bool, ch chan string, scanner *bufio.Scanner) {
+	for range scanner.Text() {
+		log.Println(<-ch)
+	}
+	finish <- false
+	close(finish)
+	close(ch)
 }
 
 func main() {
-	log.Println("----------------------Ex1----------------------")
-	ex_1()
-	log.Println("----------------------Ex2----------------------")
-	ex_2()
-	log.Println("----------------------Ex3----------------------")
-	ctx := context.Background()
-	err := ex_3(ctx)
-	if err != nil {
-		log.Println(err)
-	} else {
-		log.Println("Success!")
+	log.Println("-------------Ex1---------------")
+	ex_1a()
+	log.Println("-------------Channel-------------")
+	ex_1b()
+	log.Println("-------------WaitGroup-----------------")
+	ex_1c()
+	log.Println("------------------Mutex-----------------------")
+	ex_1d()
+	log.Println("------------------Ex2-----------------------")
+	X := make(map[string]string)
+	wg.Add(3)
+	go ex2_add1(X)
+	go ex2_add2(X)
+	go ex2_add3(X)
+	wg.Wait()
+	count := 0
+	for key, value := range X {
+		log.Println("Key",key,"Value", value)
+		count++
+		if count == 15 {
+			break
+		}
 	}
-	log.Println("----------------------Ex4----------------------")
-	ex_4()
-	log.Println("----------------------Ex5----------------------")
-	ex_5()
-	log.Println("----------------------Ex6----------------------")
-	log.Println("Cac moc don vi: yyyy-mm-dd hh:mm:ss + nsec nanoseconds")
-	log.Println("----------------------Ex7----------------------")
-	ex_7()
-	log.Println("----------------------Ex8----------------------")
-	ex_8()
-	log.Println("----------------------Ex9----------------------")
-	ex_9()
+	log.Println("Add value:", count)
 
+	log.Println("------------------Ex3-----------------------")
+	errFunc()
+
+	log.Println("------------------Ex4-----------------------")
+	ex4()
 }

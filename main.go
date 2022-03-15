@@ -163,7 +163,7 @@ func errFunc() {
 
 func ex4() {
 	ch := make(chan string, 10)
-	finish := make(chan bool, 10)
+	finish := make(chan bool)
 	file, err := os.Open("file.txt")
 	if err != nil {
 		log.Fatal(err)
